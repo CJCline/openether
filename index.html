@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>OpenEther Network Security Consulting</title>
+  <meta name="description" content="Architecture-first network security assessments, infrastructure documentation, and hardening for high-stakes environments." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --void: #0B0C10;
+      --void-elevated: #12141A;
+      --void-card: #151821;
+      --slate: #93A3C3;
+      --slate-strong: #8395C1;
+      --hardware: #7A756B;
+      --terminal: #EAEFF8;
+      --neon: #39FF14;
+      --line: rgba(122, 117, 107, 0.35);
+      --line-strong: rgba(147, 163, 195, 0.28);
+      --radius: 14px;
+      --font: "Inter", system-ui, -apple-system, sans-serif;
+      --display: "Space Grotesk", "Inter", system-ui, sans-serif;
+      --mono: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: var(--font);
+      background:
+        radial-gradient(1000px 520px at 8% -8%, rgba(147, 163, 195, 0.10), transparent 55%),
+        radial-gradient(800px 420px at 92% 0%, rgba(122, 117, 107, 0.12), transparent 50%),
+        var(--void);
+      color: var(--terminal);
+      line-height: 1.55;
+    }
+    a { color: var(--slate); text-decoration: none; }
+    a:hover { color: var(--terminal); }
+    .wrap { width: min(1080px, calc(100% - 2.5rem)); margin: 0 auto; }
+    header {
+      position: sticky; top: 0; z-index: 20;
+      backdrop-filter: blur(16px);
+      background: rgba(11, 12, 16, 0.88);
+      border-bottom: 1px solid var(--line);
+    }
+    .nav {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 1rem; padding: 0.85rem 0;
+    }
+    .brand {
+      display: flex; align-items: center;
+      text-decoration: none; min-width: 0;
+    }
+    .brand:hover { opacity: 0.92; }
+    
+    .nav-links { display: flex; gap: 1.15rem; align-items: center; flex-wrap: wrap; }
+    .nav-links a { color: var(--hardware); font-size: 0.9rem; font-weight: 500; }
+    .nav-links a:hover { color: var(--slate); text-decoration: none; }
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      gap: 0.4rem; border-radius: 999px; padding: 0.7rem 1.15rem;
+      font-weight: 600; font-size: 0.92rem; border: 1px solid transparent;
+      cursor: pointer; text-decoration: none !important; font-family: var(--font);
+    }
+    .btn-primary {
+      background: var(--neon);
+      color: #0B0C10 !important;
+      box-shadow: 0 10px 28px rgba(57, 255, 20, 0.22);
+    }
+    .btn-primary:hover { filter: brightness(1.06); color: #0B0C10 !important; }
+    .btn-ghost {
+      background: transparent; color: var(--terminal) !important;
+      border-color: var(--line-strong);
+    }
+    .btn-ghost:hover { background: rgba(147, 163, 195, 0.06); }
+    .hero { padding: 4.4rem 0 3rem; }
+    .eyebrow {
+      display: inline-flex; align-items: center; gap: 0.45rem;
+      padding: 0.28rem 0.7rem; border-radius: 999px;
+      border: 1px solid var(--line-strong);
+      background: rgba(147, 163, 195, 0.08);
+      color: var(--slate);
+      font-family: var(--mono);
+      font-size: 0.74rem; font-weight: 500; letter-spacing: 0.05em;
+      text-transform: uppercase; margin-bottom: 1.15rem;
+    }
+    h1, h2, h3 { font-family: var(--display); letter-spacing: -0.02em; }
+    h1 {
+      font-size: clamp(2.15rem, 4.5vw, 3.3rem);
+      line-height: 1.1; margin: 0 0 1rem; max-width: 15ch;
+      color: var(--terminal); font-weight: 700;
+    }
+    .lede {
+      font-size: 1.08rem; color: var(--slate); max-width: 40rem; margin: 0 0 1.7rem;
+    }
+    .hero-actions { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 2.3rem; }
+    .hero-panel { display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 1.15rem; }
+    .card {
+      background: linear-gradient(180deg, rgba(147, 163, 195, 0.05), transparent 42%), var(--void-card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 1.3rem 1.35rem;
+    }
+    .card h3 { margin: 0 0 0.55rem; font-size: 1.05rem; color: var(--terminal); }
+    .card p { margin: 0; color: var(--hardware); font-size: 0.95rem; }
+    .stat-grid { display: grid; gap: 0.8rem; }
+    .stat {
+      padding: 0.95rem 1rem; border-radius: 12px;
+      background: var(--void-elevated); border: 1px solid var(--line);
+    }
+    .stat strong { display: block; font-size: 1rem; margin-bottom: 0.2rem; color: var(--slate); font-family: var(--display); }
+    .stat span { color: var(--hardware); font-size: 0.88rem; }
+    section { padding: 1.1rem 0 3.3rem; }
+    .section-head { margin-bottom: 1.35rem; max-width: 44rem; }
+    .section-head h2 {
+      margin: 0 0 0.55rem; font-size: clamp(1.55rem, 2.6vw, 2rem);
+      color: var(--terminal);
+    }
+    .section-head p { margin: 0; color: var(--hardware); }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+    .service {
+      padding: 1.25rem 1.2rem; border-radius: var(--radius);
+      background: var(--void-elevated); border: 1px solid var(--line);
+      min-height: 100%;
+    }
+    .service .tag {
+      font-family: var(--mono); font-size: 0.72rem; color: var(--slate);
+      letter-spacing: 0.04em; margin-bottom: 0.7rem;
+    }
+    .service h3 { margin: 0 0 0.5rem; font-size: 1.05rem; }
+    .service p { margin: 0; color: var(--hardware); font-size: 0.93rem; }
+    .steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.85rem; }
+    .step {
+      padding: 1.05rem 1rem; border-radius: 12px;
+      border: 1px solid var(--line); background: rgba(18, 20, 26, 0.9);
+    }
+    .step .n {
+      font-family: var(--mono); color: var(--neon); font-size: 0.78rem;
+      margin-bottom: 0.5rem;
+    }
+    .step h3 { margin: 0 0 0.4rem; font-size: 0.98rem; }
+    .step p { margin: 0; color: var(--hardware); font-size: 0.88rem; }
+    .diff { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .diff .card ul { margin: 0.7rem 0 0; padding-left: 1.1rem; color: var(--hardware); }
+    .diff .card li { margin: 0.35rem 0; }
+    .note {
+      margin-top: 1rem; padding: 0.9rem 1rem; border-radius: 12px;
+      background: rgba(57, 255, 20, 0.08);
+      border: 1px solid rgba(57, 255, 20, 0.28);
+      color: #b8ff9a; font-size: 0.88rem;
+    }
+    .about { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 1rem; }
+    .contact-list { list-style: none; padding: 0; margin: 0.85rem 0 1.15rem; }
+    .contact-list li { margin: 0.5rem 0; color: var(--hardware); }
+    .contact-list strong {
+      color: var(--slate); display: inline-block; min-width: 4.2rem;
+      font-family: var(--mono); font-size: 0.8rem; font-weight: 500;
+    }
+    footer {
+      border-top: 1px solid var(--line);
+      padding: 1.35rem 0 2.1rem; color: var(--hardware); font-size: 0.86rem;
+    }
+    footer .wrap { display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap; align-items: center; }
+    
+    @media (max-width: 900px) {
+      .hero-panel, .grid-3, .steps, .diff, .about { grid-template-columns: 1fr; }
+      h1 { max-width: none; }
+      
+    }
+
+    .logo-svg { display: block; height: auto; width: min(340px, 72vw); max-height: 64px; object-fit: contain; object-position: left center; }
+    .logo-header { width: min(360px, 75vw); max-height: 68px; }
+    .logo-footer { width: min(220px, 55vw); max-height: 42px; opacity: 0.95; }
+    @media (max-width: 900px) { .logo-header { width: min(300px, 82vw); max-height: 56px; } }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap nav">
+      <a class="brand" href="#top" aria-label="OpenEther home">
+        <img class="logo-svg logo-header" src="logo.png" alt="OpenEther" width="700" height="140" />
+      </a>
+      <nav class="nav-links" aria-label="Primary">
+        <a href="#services">Services</a>
+        <a href="#approach">Approach</a>
+        <a href="#edge">Edge</a>
+        <a href="#contact" class="btn btn-primary">Talk with us</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <div class="wrap">
+        <div class="eyebrow">Network security · Architecture first</div>
+        <h1>Hard routing. Real visibility. Defensible networks.</h1>
+        <p class="lede">
+          OpenEther works peer-to-peer with engineering teams and security leaders who need
+          rigorous validation of what is on the wire, not generic security theater.
+        </p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="#contact">Book a discovery call</a>
+          <a class="btn btn-ghost" href="#services">Review services</a>
+        </div>
+        <div class="hero-panel">
+          <div class="card">
+            <h3>Past checkboxes. Into the stack.</h3>
+            <p>
+              We address routing, switching, and protocol security at the metal: inventory what exists,
+              prove where risk concentrates, and leave you with documentation and remediation steps your team can execute.
+            </p>
+          </div>
+          <div class="stat-grid">
+            <div class="stat">
+              <strong>Assessment → remediation path</strong>
+              <span>Findings paired with prioritized fixes and implementable steps</span>
+            </div>
+            <div class="stat">
+              <strong>Living network documentation</strong>
+              <span>Scan, inventory, diagrams, and docs that match production</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="services">
+      <div class="wrap">
+        <div class="section-head">
+          <h2>Services</h2>
+          <p>Scoped engagements for high-stakes environments. Standalone or ongoing.</p>
+        </div>
+        <div class="grid-3">
+          <article class="service">
+            <div class="tag">01 · Core</div>
+            <h3>Network security assessment</h3>
+            <p>
+              Structured validation of what is present, exposed, and misaligned. You receive clear
+              documentation of findings plus a prioritized remediation plan with practical steps and scripts where they help.
+            </p>
+          </article>
+          <article class="service">
+            <div class="tag">02 · Differentiator</div>
+            <h3>Network documentation &amp; diagrams</h3>
+            <p>
+              Scan and inventory infrastructure, then produce accurate documentation and diagrams
+              for operations, audits, and change planning. This is our primary differentiator.
+            </p>
+          </article>
+          <article class="service">
+            <div class="tag">03 · Follow-through</div>
+            <h3>Hardening &amp; remediation support</h3>
+            <p>
+              Convert findings into completed work: baselines, segmentation, safer remote access,
+              and guided implementation of the highest-impact fixes.
+            </p>
+          </article>
+          <article class="service">
+            <div class="tag">04</div>
+            <h3>Architecture &amp; design review</h3>
+            <p>
+              Independent review of proposed or existing designs before hardware, cloud connectivity,
+              or a major refresh locks in avoidable risk.
+            </p>
+          </article>
+          <article class="service">
+            <div class="tag">05</div>
+            <h3>Firewall, VPN &amp; edge review</h3>
+            <p>
+              Rule hygiene, remote access patterns, and perimeter posture so edge controls match
+              policy and reduce avoidable exposure.
+            </p>
+          </article>
+          <article class="service">
+            <div class="tag">06</div>
+            <h3>Ongoing security advisory</h3>
+            <p>
+              Retainer support for change review, vendor questions, incident readiness advice,
+              and keeping documentation current as the network evolves.
+            </p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="approach">
+      <div class="wrap">
+        <div class="section-head">
+          <h2>Engagement model</h2>
+          <p>Direct, transparent, and built to leave durable artifacts, not a binder that ages out.</p>
+        </div>
+        <div class="steps">
+          <div class="step">
+            <div class="n">01</div>
+            <h3>Discovery</h3>
+            <p>Goals, constraints, and what “done” means for your operators and leadership.</p>
+          </div>
+          <div class="step">
+            <div class="n">02</div>
+            <h3>Visibility</h3>
+            <p>Inventory and assessment work that maps what is present and where risk concentrates.</p>
+          </div>
+          <div class="step">
+            <div class="n">03</div>
+            <h3>Findings</h3>
+            <p>Current state, gaps, prioritized fixes, and implementation guidance you can act on.</p>
+          </div>
+          <div class="step">
+            <div class="n">04</div>
+            <h3>Action</h3>
+            <p>Optional remediation support so improvements land in production, not in a deck.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="edge">
+      <div class="wrap">
+        <div class="section-head">
+          <h2>Why OpenEther</h2>
+          <p>Operator-grade delivery tools. Client-ready outcomes. No theater.</p>
+        </div>
+        <div class="diff">
+          <div class="card">
+            <h3>Internal tooling, external clarity</h3>
+            <ul>
+              <li>Security audit tooling that documents what is present and what needs correction</li>
+              <li>Network documentation tooling that scans, inventories, and produces diagrams</li>
+              <li>Remediation guidance framed as steps and scripts engineers can run</li>
+            </ul>
+            <div class="note">
+              These applications power OpenEther delivery. They are used during engagements;
+              they are not products your staff need to install or operate.
+            </div>
+          </div>
+          <div class="card">
+            <h3>Who we work with</h3>
+            <ul>
+              <li>Enterprise engineering teams and infrastructure architects</li>
+              <li>CISOs and security leaders who need rigorous network validation</li>
+              <li>High-stakes environments where packet-level facts beat slideware</li>
+              <li>Internal IT and MSP partners who need a specialist for network security work</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="contact">
+      <div class="wrap about">
+        <div class="card">
+          <h3>Talk about your network</h3>
+          <p style="color:var(--hardware);margin:0 0 0.9rem;">
+            Share the problem space: visibility gaps, hardening priorities, documentation debt,
+            or a specific project. We reply with a clear next step and, if it fits, a scoped proposal.
+          </p>
+          <p style="color:var(--hardware);margin:0;">
+            OpenEther Network Security Consulting is forming as an LLC. Engagements are led by
+            Chris Cline, focused on architecture-first defense and tactile infrastructure clarity.
+          </p>
+        </div>
+        <div class="card">
+          <h3>Contact</h3>
+          <ul class="contact-list">
+            <li><strong>Name</strong> Chris Cline</li>
+            <li><strong>Email</strong> <a href="mailto:christopher.james.cline@gmail.com">christopher.james.cline@gmail.com</a></li>
+            <li><strong>Phone</strong> <a href="tel:+18139228282">813-922-8282</a></li>
+            <li><strong>Area</strong> Tampa Bay / St. Petersburg, FL</li>
+          </ul>
+          <a class="btn btn-primary" href="mailto:christopher.james.cline@gmail.com?subject=OpenEther%20discovery%20call">Email OpenEther</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <div style="display:flex;align-items:center;gap:0.85rem;flex-wrap:wrap;">
+        <img class="logo-svg logo-footer" src="logo.png" alt="" width="700" height="140" />
+        <span>© <span id="y"></span> OpenEther Network Security Consulting</span>
+      </div>
+      <div>Network security consulting</div>
+    </div>
+  </footer>
+  <script>document.getElementById("y").textContent = new Date().getFullYear();</script>
+</body>
+</html>
